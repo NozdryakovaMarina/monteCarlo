@@ -1,26 +1,44 @@
-import multiprocessing
+import sys
+import time
 import random
-from math import pi
+import multiprocessing
 
 
-def monteCarlo(i):
+def monteCarlo(i: int) -> float:
+
     sum = 0.0
     x = random.random()
     y = random.random()
-    sum += (x * x +y * y < 1.0)
+    sum += x * x + y * y < 1.0
     return sum
 
 
-def main():
-    num = int(input("Enter the number of points to generate: "))
+def count_pi(num: int) -> float:
+    sum = 0.0
+    for i in range(num):
+        x = random.random()
+        y = random.random()
+        sum += x * x + y * y < 1.0
+    return float(sum) / num * 4
+
+
+def multiprocessing_count_pi(num: int) -> float:
     iter = [i for i in range(num)]
     total_sum = 0
-    with multiprocessing.Pool(multiprocessing.cpu_count() * 2) as p:
-        # n_cores = multiprocessing.cpu_count()*2
-        # print(f'Number of logical CPU cores: {n_cores}')
+    with multiprocessing.Pool(6) as p:
         d = p.map(monteCarlo, iter)
-        for j in range(len(d)):
-            total_sum += d[j]
-        result = (total_sum/num) * 4
-        print(f'pi method Monte-Carlo: {result}')
-        print(f'pi: {pi}')
+        for j in d:
+            total_sum += j
+    return float(total_sum) / num * 4
+
+
+def main():
+    num = int(sys.argv[1])
+
+    t0 = time.time()
+    res = multiprocessing_count_pi(num)
+    print(f"For a Monte Carlo function with parallel computing: pi =  {res}, время = {time.time() - t0}")
+
+    t0 = time.time()
+    res = count_pi(num)
+    print(f"For the usual Monte Carlo function: pi =  {res}, время = {time.time() - t0}")
