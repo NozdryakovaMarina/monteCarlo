@@ -5,7 +5,6 @@ import multiprocessing
 
 
 def monteCarlo(i: int) -> float:
-
     sum = 0.0
     x = random.random()
     y = random.random()
